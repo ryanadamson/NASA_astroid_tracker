@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Asteroid Tracker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a1a; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 2rem; }
+    h1 { text-align: center; font-size: 2.5rem; margin-bottom: 0.5rem; color: #ff6b35; }
+    p.subtitle { text-align: center; color: #888; margin-bottom: 2rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+    .card { background: #1a1a2e; border-radius: 12px; padding: 1.2rem; border: 1px solid #333; }
+    .card.hazardous { border-color: #ff4444; }
+    .card h2 { font-size: 1rem; margin-bottom: 0.8rem; color: #ff6b35; }
+    .stat { display: flex; justify-content: space-between; margin: 0.3rem 0; font-size: 0.9rem; }
+    .stat span:last-child { color: #aaa; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; margin-top: 0.5rem; }
+    .badge.safe { background: #1a4a1a; color: #4caf50; }
+    .badge.danger { background: #4a1a1a; color: #ff4444; }
+    .loading { text-align: center; font-size: 1.2rem; color: #888; margin-top: 4rem; }
+  </style>
+</head>
+<body>
+  <h1>🌍 Asteroid Tracker</h1>
+  <p class="subtitle">Near-Earth objects passing by this week, sorted by closest approach</p>
+  <div id="app" class="loading">Loading asteroid data...</div>
+
+  <script>
+    fetch('/api/asteroids')
+      .then(r => r.json())
+      .then(data => {
+        const app = document.getElementById('app');
+        app.className = 'grid';
+        app.innerHTML = data.map(a => `
+          <div class="card ${a.hazardous ? 'hazardous' : ''}">
+            <h2>${a.name}</h2>
+            <div class="stat"><span>📅 Date</span><span>${a.date}</span></div>
+            <div class="stat"><span>📏 Diameter</span><span>${a.diameter_m.toLocaleString()} m</span></div>
+            <div class="stat"><span>🚀 Miss Distance</span><span>${a.miss_distance_km.toLocaleString()} km</span></div>
+            <span class="badge ${a.hazardous ? 'danger' : 'safe'}">
+              ${a.hazardous ? '⚠️ Potentially Hazardous' : '✅ Safe'}
+            </span>
+          </div>
+        `).join('');
+      });
+  </script>
+</body>
+</html>
